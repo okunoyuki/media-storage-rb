@@ -31,15 +31,34 @@ Or execute the following line to install the gem without bundler.
 
 You can find [a working rails sample app using Ricoh Media Storage API](https://github.com/ricohapi/media-storage-sample-app).
 
+## Sample Flow
+
+```ruby
+# Require
+require 'ricohapi/mstorage'
+
+# Set your Ricoh API Client Credentials
+client = RicohAPI::Auth::Client.new '<your-client-id>', '<your-client-secret>'
+
+# Set your resource owner credentials (Ricoh ID)
+client.resource_owner_credentials = '<your-user-id>', '<your-password>'
+
+# Connect to the server
+api_session = client.api_token_for! RicohAPI::MStorage::SCOPE
+
+# Initialize a MediaStorage object with a valid access token
+mstorage = RicohAPI::MStorage::Client.new api_session.access_token
+
+# Upload
+mstorage.upload content: file
+```
+
 ## SDK API
 
 ### Obtain an access token
 
 ```ruby
-client = RicohAPI::Auth::Client.new(
-  '<your-client-id>',
-  '<your-client-secret>'
-)
+client = RicohAPI::Auth::Client.new '<your-client-id>', '<your-client-secret>'
 client.resource_owner_credentials = '<your-user-id>', '<your-password>'
 api_session = client.api_token_for! RicohAPI::MStorage::SCOPE
 access_token = api_session.access_token
@@ -48,9 +67,7 @@ access_token = api_session.access_token
 ### Constructor
 
 ```ruby
-mstorage = RicohAPI::MStorage::Client.new(
-  access_token
-)
+mstorage = RicohAPI::MStorage::Client.new access_token
 ```
 
 ### Upload
