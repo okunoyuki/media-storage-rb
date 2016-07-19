@@ -39,7 +39,7 @@ module RicohAPI
 
       # GET /media/{id}/meta, GET /media/{id}/meta/exif, GET /media/{id}/meta/gpano,
       # GET /media/{id}/meta/user, GET /media/{id}/meta/user/{key}
-      def meta(media_id, fieldName = nil)
+      def meta(media_id, field_name = nil)
         handle_response do
           token.get endpoint_for("media/#{media_id}/meta")
         end
@@ -60,12 +60,12 @@ module RicohAPI
       end
 
       # PUT /media/{id}/meta/user/{key}
-      def addMeta(media_id, userMeta)
+      def add_meta(media_id, user_meta)
         # TODO: do something
       end
 
       # DELETE /media/{id}/meta/user, DELETE /media/{id}/meta/user/{key}
-      def removeMeta(media_id, key)
+      def remove_meta(media_id, key)
         # TODO: do something
       end
 

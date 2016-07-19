@@ -42,14 +42,14 @@ client = RicohAPI::Auth::Client.new(
 )
 client.resource_owner_credentials = '<your-user-id>', '<your-password>'
 api_session = client.api_token_for! RicohAPI::MStorage::SCOPE
-your_access_token = api_session.access_token
+access_token = api_session.access_token
 ```
 
 ### Constructor
 
 ```ruby
 mstorage = RicohAPI::MStorage::Client.new(
-  your_access_token
+  access_token
 )
 ```
 
@@ -84,7 +84,7 @@ mstorage.list after: '<cursor-id>'
 
 Also, you can get a list searched by user metadata.
 ```ruby
-filter = {'meta.user.<key1>'=>'<value1>', 'meta.user.<key2>'=>'<value2>'}
+filter = {'meta.user.<key1>' => '<value1>', 'meta.user.<key2>' => '<value2>'}
 mstorage.list limit: 25, after: '<cursor-id>', filter: filter
 ```
 
@@ -105,7 +105,7 @@ You can define your original metadata as a 'user metadata'.
 Existing metadata value for the same key will be overwritten. Up to 10 user metadata can be attached to a media data.
 
 ```ruby
-mstorage.addMeta '<media-id>', {'user.<key1>'=>'<value1>', 'user.<key2>'=>'<value2>'}
+mstorage.add_meta '<media-id>', {'user.<key1>' => '<value1>', 'user.<key2>' => '<value2>'}
 ```
 
 ### Get media metadata
@@ -137,12 +137,12 @@ mstorage.meta '<media-id>', 'user.<key>'
 ### Delete media metadata
 * User metadata (all)
 ```ruby
-mstorage.removeMeta '<media-id>', 'user'
+mstorage.remove_meta '<media-id>', 'user'
 ```
 
 * User metadata (with a key)
 ```ruby
-mstorage.removeMeta '<media-id>', 'user.<key>'
+mstorage.remove_meta '<media-id>', 'user.<key>'
 ```
 
 ## References
