@@ -32,7 +32,7 @@ Or execute the following line to install the gem without bundler.
 You can find [a working rails sample app using Ricoh Media Storage API](https://github.com/ricohapi/media-storage-sample-app).
 
 ## SDK API
-Require `ricohapi/mstorage` to use the APIs below.
+Add `require 'ricohapi/mstorage'` to use the APIs below.
 
 ### Obtain an access token
 
