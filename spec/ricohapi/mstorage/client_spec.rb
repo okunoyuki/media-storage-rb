@@ -55,7 +55,7 @@ describe RicohAPI::MStorage::Client do
       response = mock_request :get, "/media/#{media_id}/meta", 'meta.json' do
         client.meta media_id
       end
-      response.should include :exif, :gpano
+      response.should include :exif, :gpano, :user
     end
   end
 
