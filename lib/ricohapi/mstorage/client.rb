@@ -8,6 +8,10 @@ module RicohAPI
 
       class Error < StandardError; end
       class Unauthorized < Error; end
+      class BadRequest < Error; end
+      class NotFound < Error; end
+
+      SEARCH_VERSION = '2016-07-08'
 
       def initialize(access_token)
         self.token = Auth::AccessToken.new access_token
@@ -16,10 +20,24 @@ module RicohAPI
       # GET /media
       def list(params = {})
         params.reject! do |k, v|
-          ![:after, :before, :limit].include? k.to_sym
+          ![:after, :before, :limit, :filter].include? k.to_sym
         end
-        handle_response do
-          token.get endpoint_for('media'), params
+        if params.include? :filter
+          handle_response do
+            token.post endpoint_for('media/search'), {
+              search_veresion: SEARCH_VERSION,
+              query: params[:filter],
+              paging: {
+                before: params[:before],
+                after: params[:after],
+                limit: params[:limit]
+              }
+            }.to_json, {'Content-Type': 'application/json'}
+          end
+        else
+          handle_response do
+            token.get endpoint_for('media'), params
+          end
         end
       end
 
@@ -101,8 +119,12 @@ module RicohAPI
             _response_ = MultiJson.load response.body
             _response_.with_indifferent_access if _response_.respond_to? :with_indifferent_access
           end
+        when 400
+          raise BadRequest.new('The parameter might be wrong.')
         when 401
           raise Unauthorized.new('API access expired or revoked, please re-login.')
+        when 404
+          raise NotFound.new('The parameter might be wrong.')
         else
           raise Error.new('Unknown API Error')
         end
