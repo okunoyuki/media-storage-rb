@@ -41,7 +41,13 @@ module RicohAPI
       # GET /media/{id}/meta/user, GET /media/{id}/meta/user/{key}
       def meta(media_id, field_name = nil)
         handle_response do
-          token.get endpoint_for("media/#{media_id}/meta")
+          unless field_name
+            # GET /media/{id}/meta
+            token.get endpoint_for("media/#{media_id}/meta")
+          else
+            # GET /media/{id}/meta/exif, GET /media/{id}/meta/gpano, GET /media/{id}/meta/user
+            token.get endpoint_for("media/#{media_id}/meta/#{field_name}")
+          end
         end
       end
 

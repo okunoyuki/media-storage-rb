@@ -51,11 +51,38 @@ describe RicohAPI::MStorage::Client do
   end
 
   describe '#meta' do
-    it 'should return metadata of the media' do
+    it 'should return all metadata of the media' do
       response = mock_request :get, "/media/#{media_id}/meta", 'meta.json' do
         client.meta media_id
       end
       response.should include :exif, :gpano, :user
+    end
+  end
+
+  describe '#meta(exif)' do
+    it 'should return exif of the media' do
+      response = mock_request :get, "/media/#{media_id}/meta/exif", 'exif.json' do
+        client.meta media_id, 'exif'
+      end
+      response.should be_a Hash
+    end
+  end
+
+  describe '#meta(gpano)' do
+    it 'should return gpano of the media' do
+      response = mock_request :get, "/media/#{media_id}/meta/gpano", 'gpano.json' do
+        client.meta media_id, 'gpano'
+      end
+      response.should be_a Hash
+    end
+  end
+
+  describe '#meta(user)' do
+    it 'should return user metadata of the media' do
+      response = mock_request :get, "/media/#{media_id}/meta/user", 'user.json' do
+        client.meta media_id, 'user'
+      end
+      response.should be_a Hash
     end
   end
 
