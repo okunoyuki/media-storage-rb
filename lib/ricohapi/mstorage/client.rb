@@ -92,12 +92,11 @@ module RicohAPI
 
       # PUT /media/{id}/meta/user/{key}
       def add_meta(media_id, user_meta)
-        if user_meta.empty?
-          raise Error.new("user_meta is empty: nothing to request.")
-        end
+        raise Error.new("user_meta is empty: nothing to request.") if user_meta.empty?
         user_meta.each do |k, v|
-          if k.empty? || !valid?(v)
-            raise Error.new("Invalid parameter: {#{k} => #{v}}")
+          validate(v)
+          if k.empty?
+            raise Error.new("Invalid parameter: One of the given keys is empty")
           end
           USER_META_REGEX =~ k
           handle_response(:as_raw) do
@@ -136,8 +135,9 @@ module RicohAPI
         File.join BASE_URL, path
       end
 
-      def valid?(value)
-        value.length >= MIN_USER_META_LENGTH && value.length <= MAX_USER_META_LENGTH
+      def validate(value)
+        raise Error.new("Invalid parameter: One of the given values is too big or too small: #{value}") unless (MIN_USER_META_LENGTH..MAX_USER_META_LENGTH).include? value.length
+        true
       end
     end
   end
