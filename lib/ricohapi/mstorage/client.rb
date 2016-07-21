@@ -9,6 +9,8 @@ module RicohAPI
       class Error < StandardError; end
 
       SEARCH_VERSION = '2016-07-08'
+      MAX_USER_META_LENGTH = 1024
+      MIN_USER_META_LENGTH = 1
 
       def initialize(access_token)
         self.token = Auth::AccessToken.new access_token
@@ -76,7 +78,16 @@ module RicohAPI
 
       # PUT /media/{id}/meta/user/{key}
       def add_meta(media_id, user_meta)
-        # TODO: do something
+        user_meta.each do |k, v|
+          if k == nil || !valid?(k)
+            raise Error.new("Invalid parameter: {#{k} => #{v}}")
+          end
+          # TODO: replace with USER_META_REGEX
+          /^user\.([A-Za-z0-9_\-]{1,256})$/ =~ k
+          handle_response(:as_raw) do
+            token.put endpoint_for("media/#{media_id}/meta/user/#{$1}"), v, {'Content-Type': 'text/plain'}
+          end
+        end
       end
 
       # DELETE /media/{id}/meta/user, DELETE /media/{id}/meta/user/{key}
@@ -107,6 +118,10 @@ module RicohAPI
 
       def endpoint_for(path)
         File.join BASE_URL, path
+      end
+
+      def valid?(value)
+        value.length >= MIN_USER_META_LENGTH && value.length <= MAX_USER_META_LENGTH
       end
     end
   end
