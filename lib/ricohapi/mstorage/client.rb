@@ -7,7 +7,8 @@ module RicohAPI
       attr_accessor :token
 
       class Error < StandardError; end
-      class Unauthorized < Error; end
+
+      SEARCH_VERSION = '2016-07-08'
 
       def initialize(access_token)
         self.token = Auth::AccessToken.new access_token
@@ -16,10 +17,24 @@ module RicohAPI
       # GET /media
       def list(params = {})
         params.reject! do |k, v|
-          ![:after, :before, :limit].include? k.to_sym
+          ![:after, :before, :limit, :filter].include? k.to_sym
         end
-        handle_response do
-          token.get endpoint_for('media'), params
+        if params.include? :filter
+          handle_response do
+            token.post endpoint_for('media/search'), {
+              search_veresion: SEARCH_VERSION,
+              query: params[:filter],
+              paging: {
+                before: params[:before],
+                after: params[:after],
+                limit: params[:limit]
+              }
+            }.to_json, {'Content-Type': 'application/json'}
+          end
+        else
+          handle_response do
+            token.get endpoint_for('media'), params
+          end
         end
       end
 
@@ -69,26 +84,6 @@ module RicohAPI
         # TODO: do something
       end
 
-      def tags(params = {})
-        handle_response do
-          token.get endpoint_for('tags')
-        end
-      end
-
-      def tags_on(media_id)
-        handle_response do
-          token.get endpoint_for("media/#{media_id}/tags")
-        end
-      end
-
-      def tags_to(media_id, tag)
-        handle_response do
-          token.post endpoint_for("media/#{media_id}/tags"), {
-            name: tag
-          }.to_json, {'Content-Type': 'application/json'}
-        end
-      end
-
       private
 
       def handle_response(as_raw = false, retrying = false)
@@ -101,10 +96,12 @@ module RicohAPI
             _response_ = MultiJson.load response.body
             _response_.with_indifferent_access if _response_.respond_to? :with_indifferent_access
           end
-        when 401
-          raise Unauthorized.new('API access expired or revoked, please re-login.')
         else
-          raise Error.new('Unknown API Error')
+          begin
+            raise Error.new("Status code #{response.status}: #{JSON.parse(response.body)["reason"]}")
+          rescue JSON::ParserError
+            raise Error.new("Status code #{response.status}: Unexpected response: #{response.body}")
+          end
         end
       end
 

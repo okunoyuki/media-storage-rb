@@ -5,5 +5,5 @@
     "ImageWidth": "160.0"
   },
   "gpano": {},
-  "user": {}
+  "user": {"key1": "value1"}
 }
