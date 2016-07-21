@@ -7,9 +7,6 @@ module RicohAPI
       attr_accessor :token
 
       class Error < StandardError; end
-      class Unauthorized < Error; end
-      class BadRequest < Error; end
-      class NotFound < Error; end
 
       SEARCH_VERSION = '2016-07-08'
 
@@ -119,14 +116,12 @@ module RicohAPI
             _response_ = MultiJson.load response.body
             _response_.with_indifferent_access if _response_.respond_to? :with_indifferent_access
           end
-        when 400
-          raise BadRequest.new('The parameter might be wrong.')
-        when 401
-          raise Unauthorized.new('API access expired or revoked, please re-login.')
-        when 404
-          raise NotFound.new('The parameter might be wrong.')
         else
-          raise Error.new('Unknown API Error')
+          begin
+            raise Error.new("Status code #{response.status}: #{JSON.parse(response.body)["reason"]}")
+          rescue JSON::ParserError
+            raise Error.new("Status code #{response.status}: Unexpected response: #{response.body}")
+          end
         end
       end
 
