@@ -128,4 +128,26 @@ describe RicohAPI::MStorage::Client do
       response.should == ''
     end
   end
+
+  describe '#remove_meta (all user metadata)' do
+    it 'should return nothing' do
+      response = mock_request :delete, "/media/#{media_id}/meta/user", 'delete.data' do
+        client.remove_meta media_id, 'user'
+      end
+      response.should == ''
+    end
+  end
+
+  describe '#remove_meta (specified user metadata)' do
+    it 'should return nothing' do
+      response = mock_request :delete, "/media/#{media_id}/meta/user/#{user_meta_key}", 'delete.data' do
+        client.remove_meta media_id, "user.#{user_meta_key}"
+      end
+      response.should == ''
+    end
+
+    it 'should raise error when key is invalid format' do
+      expect{client.remove_meta media_id, "user."}.to raise_error(RicohAPI::MStorage::Client::Error)
+    end
+  end
 end
