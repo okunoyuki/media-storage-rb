@@ -92,8 +92,11 @@ module RicohAPI
 
       # PUT /media/{id}/meta/user/{key}
       def add_meta(media_id, user_meta)
+        if user_meta.empty?
+          raise Error.new("user_meta is empty: nothing to request.")
+        end
         user_meta.each do |k, v|
-          if k == nil || !valid?(k)
+          if k.empty? || !valid?(v)
             raise Error.new("Invalid parameter: {#{k} => #{v}}")
           end
           USER_META_REGEX =~ k
