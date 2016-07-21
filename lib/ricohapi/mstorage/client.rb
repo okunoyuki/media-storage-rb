@@ -105,7 +105,7 @@ module RicohAPI
             token.delete endpoint_for("media/#{media_id}/meta/user/#{$1}")
           end
         else
-          raise Error.new("invalid key: #{key}")
+          raise Error.new("invalid key: #{key.inspect}")
         end
       end
 
