@@ -9,6 +9,7 @@ module RicohAPI
       class Error < StandardError; end
 
       SEARCH_VERSION = '2016-07-08'
+      USER_META_REGEX = /^user\.([A-Za-z0-9_\-]{1,256})$/
 
       def initialize(access_token)
         self.token = Auth::AccessToken.new access_token
@@ -55,8 +56,21 @@ module RicohAPI
       # GET /media/{id}/meta, GET /media/{id}/meta/exif, GET /media/{id}/meta/gpano,
       # GET /media/{id}/meta/user, GET /media/{id}/meta/user/{key}
       def meta(media_id, field_name = nil)
-        handle_response do
-          token.get endpoint_for("media/#{media_id}/meta")
+        case field_name
+        when nil
+          handle_response do
+            token.get endpoint_for("media/#{media_id}/meta")
+          end
+        when 'exif', 'gpano', 'user'
+          handle_response do
+            token.get endpoint_for("media/#{media_id}/meta/#{field_name}")
+          end
+        when USER_META_REGEX
+          handle_response(:as_raw) do
+            token.get endpoint_for("media/#{media_id}/meta/user/#{$1}")
+          end
+        else
+          raise Error.new("invalid field_name: #{field_name}")
         end
       end
 

@@ -3,6 +3,7 @@ require 'spec_helper'
 describe RicohAPI::MStorage::Client do
   let(:access_token) { 'access_token' }
   let(:media_id) { 'media-id' }
+  let(:user_meta_key) { 'user_meta_key' }
   let(:client) { RicohAPI::MStorage::Client.new access_token }
   subject { client }
 
@@ -62,11 +63,51 @@ describe RicohAPI::MStorage::Client do
   end
 
   describe '#meta' do
-    it 'should return metadata of the media' do
+    it 'should return all metadata of the media' do
       response = mock_request :get, "/media/#{media_id}/meta", 'meta.json' do
         client.meta media_id
       end
       response.should include :exif, :gpano, :user
+    end
+  end
+
+  describe '#meta(exif)' do
+    it 'should return exif of the media' do
+      response = mock_request :get, "/media/#{media_id}/meta/exif", 'exif.json' do
+        client.meta media_id, 'exif'
+      end
+      response.should be_a Hash
+    end
+  end
+
+  describe '#meta(gpano)' do
+    it 'should return gpano of the media' do
+      response = mock_request :get, "/media/#{media_id}/meta/gpano", 'gpano.json' do
+        client.meta media_id, 'gpano'
+      end
+      response.should be_a Hash
+    end
+  end
+
+  describe '#meta(user)' do
+    it 'should return all user metadata of the media' do
+      response = mock_request :get, "/media/#{media_id}/meta/user", 'user.json' do
+        client.meta media_id, 'user'
+      end
+      response.should be_a Hash
+    end
+  end
+
+  describe '#meta(user.<key>)' do
+    it 'should return specified user metadata of the media' do
+      response = mock_request :get, "/media/#{media_id}/meta/user/#{user_meta_key}", 'user_meta_value.txt' do
+        client.meta media_id, "user.#{user_meta_key}"
+      end
+      response.should == 'user_meta_value'
+    end
+
+    it 'should raise error when field_name is invalid format' do
+      expect{client.meta media_id, "user."}.to raise_error(RicohAPI::MStorage::Client::Error)
     end
   end
 
