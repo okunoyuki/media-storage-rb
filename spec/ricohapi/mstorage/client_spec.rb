@@ -30,6 +30,17 @@ describe RicohAPI::MStorage::Client do
         end
       end
     end
+
+    context 'when filter params given' do
+      it 'should return search result' do
+        response = mock_request :post, "/media/search", 'search.json' do
+          filter = {'meta.user.key1' => 'value1', 'meta.user.key2' => 'value2'}
+          client.list filter: filter
+        end
+        response.should include :media, :paging
+        response[:media].should be_a Array
+      end
+    end
   end
 
   describe '#info' do
