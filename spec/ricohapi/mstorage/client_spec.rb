@@ -87,9 +87,9 @@ describe RicohAPI::MStorage::Client do
     end
   end
 
-  describe '#meta(user/<key>)' do
+  describe '#meta(user.<key>)' do
     it 'should return specified user metadata of the media' do
-      response = mock_request :get, "/media/#{media_id}/meta/user/#{user_meta_key}", 'user_meta_value.data' do
+      response = mock_request :get, "/media/#{media_id}/meta/user/#{user_meta_key}", 'user_meta_value.txt' do
         client.meta media_id, "user.#{user_meta_key}"
       end
       response.should == 'user_meta_value'

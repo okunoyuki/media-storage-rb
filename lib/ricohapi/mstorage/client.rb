@@ -9,7 +9,7 @@ module RicohAPI
       class Error < StandardError; end
       class Unauthorized < Error; end
 
-      User_meta_regex = /^user\.([A-Za-z0-9_\-]{1,256})$/
+      USER_META_REGEX = /^user\.([A-Za-z0-9_\-]{1,256})$/
 
       def initialize(access_token)
         self.token = Auth::AccessToken.new access_token
@@ -42,27 +42,24 @@ module RicohAPI
       # GET /media/{id}/meta, GET /media/{id}/meta/exif, GET /media/{id}/meta/gpano,
       # GET /media/{id}/meta/user, GET /media/{id}/meta/user/{key}
       def meta(media_id, field_name = nil)
-        unless field_name
+        case field_name
+        when nil
           # GET /media/{id}/meta
           handle_response do
             token.get endpoint_for("media/#{media_id}/meta")
           end
-        else
-          if ['exif', 'gpano', 'user'].include? field_name
-            # GET /media/{id}/meta/exif, GET /media/{id}/meta/gpano, GET /media/{id}/meta/user
-            handle_response do
-              token.get endpoint_for("media/#{media_id}/meta/#{field_name}")
-            end
-          else
-            if User_meta_regex =~ field_name
-              # GET /media/{id}/meta/user/{key}
-              handle_response(:as_raw) do
-                token.get endpoint_for("media/#{media_id}/meta/user/#{$1}")
-              end
-            else
-              raise Error.new("invalid fieldName: #{field_name}")
-            end
+        when 'exif', 'gpano', 'user'
+          # GET /media/{id}/meta/exif, GET /media/{id}/meta/gpano, GET /media/{id}/meta/user
+          handle_response do
+            token.get endpoint_for("media/#{media_id}/meta/#{field_name}")
           end
+        when USER_META_REGEX
+          # GET /media/{id}/meta/user/{key}
+          handle_response(:as_raw) do
+            token.get endpoint_for("media/#{media_id}/meta/user/#{$1}")
+          end
+        else
+          raise Error.new("invalid field_name: #{field_name}")
         end
       end
 
