@@ -84,26 +84,6 @@ module RicohAPI
         # TODO: do something
       end
 
-      def tags(params = {})
-        handle_response do
-          token.get endpoint_for('tags')
-        end
-      end
-
-      def tags_on(media_id)
-        handle_response do
-          token.get endpoint_for("media/#{media_id}/tags")
-        end
-      end
-
-      def tags_to(media_id, tag)
-        handle_response do
-          token.post endpoint_for("media/#{media_id}/tags"), {
-            name: tag
-          }.to_json, {'Content-Type': 'application/json'}
-        end
-      end
-
       private
 
       def handle_response(as_raw = false, retrying = false)
