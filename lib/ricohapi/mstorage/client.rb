@@ -70,7 +70,7 @@ module RicohAPI
             token.get endpoint_for("media/#{media_id}/meta/user/#{$1}")
           end
         else
-          raise Error.new("invalid field_name: #{field_name}")
+          raise Error.new("invalid field_name: #{field_name.inspect}")
         end
       end
 
