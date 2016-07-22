@@ -92,7 +92,6 @@ module RicohAPI
 
       # PUT /media/{id}/meta/user/{key}
       def add_meta(media_id, user_meta)
-        raise Error.new("Invalid parameter: #{media_id.inspect}, #{user_meta.inspect}: nothing to request.") unless user_meta
         validate(user_meta)
         user_meta.each do |k, v|
           USER_META_REGEX =~ k
@@ -132,9 +131,10 @@ module RicohAPI
         File.join BASE_URL, path
       end
 
-      def validate(value)
-        if value.is_a? Hash
-          value.each do |k, v|
+      def validate(param)
+        raise Error.new("Invalid parameter: #{param.inspect}: nothing to request.") unless param
+        if param.is_a? Hash
+          param.each do |k, v|
             raise Error.new("Invalid parameter: #{k.inspect} => #{v.inspect}") unless k && (MIN_USER_META_LENGTH..MAX_USER_META_LENGTH).include?(v.length)
           end
         end
