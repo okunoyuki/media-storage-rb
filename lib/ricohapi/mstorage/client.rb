@@ -92,12 +92,9 @@ module RicohAPI
 
       # PUT /media/{id}/meta/user/{key}
       def add_meta(media_id, user_meta)
-        raise Error.new("user_meta is empty: nothing to request.") if user_meta.empty?
+        raise Error.new("Invalid parameter: #{media_id.inspect}, #{user_meta.inspect}: nothing to request.") unless user_meta
+        validate(user_meta)
         user_meta.each do |k, v|
-          validate(v)
-          if k.empty?
-            raise Error.new("Invalid parameter: One of the given keys is empty")
-          end
           USER_META_REGEX =~ k
           handle_response(:as_raw) do
             token.put endpoint_for("media/#{media_id}/meta/user/#{$1}"), v, {'Content-Type': 'text/plain'}
@@ -136,8 +133,12 @@ module RicohAPI
       end
 
       def validate(value)
-        raise Error.new("Invalid parameter: One of the given values is too big or too small: #{value}") unless (MIN_USER_META_LENGTH..MAX_USER_META_LENGTH).include? value.length
-        true
+        if value.is_a? Hash
+          value.each do |k, v|
+            raise Error.new("Invalid parameter: #{k.inspect} => #{v.inspect}") unless k
+            raise Error.new("Invalid parameter: #{k.inspect} => #{v.inspect}") unless (MIN_USER_META_LENGTH..MAX_USER_META_LENGTH).include? v.length
+          end
+        end
       end
     end
   end
