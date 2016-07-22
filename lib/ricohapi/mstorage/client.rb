@@ -70,7 +70,7 @@ module RicohAPI
             token.get endpoint_for("media/#{media_id}/meta/user/#{$1}")
           end
         else
-          raise Error.new("invalid field_name: #{field_name}")
+          raise Error.new("invalid field_name: #{field_name.inspect}")
         end
       end
 
@@ -95,7 +95,18 @@ module RicohAPI
 
       # DELETE /media/{id}/meta/user, DELETE /media/{id}/meta/user/{key}
       def remove_meta(media_id, key)
-        # TODO: do something
+        case key
+        when 'user'
+          handle_response(:as_raw) do
+            token.delete endpoint_for("media/#{media_id}/meta/user")
+          end
+        when USER_META_REGEX
+          handle_response(:as_raw) do
+            token.delete endpoint_for("media/#{media_id}/meta/user/#{$1}")
+          end
+        else
+          raise Error.new("invalid key: #{key.inspect}")
+        end
       end
 
       private
