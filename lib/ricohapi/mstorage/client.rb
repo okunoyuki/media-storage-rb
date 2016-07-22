@@ -10,6 +10,8 @@ module RicohAPI
 
       SEARCH_VERSION = '2016-07-08'
       USER_META_REGEX = /^user\.([A-Za-z0-9_\-]{1,256})$/
+      MAX_USER_META_LENGTH = 1024
+      MIN_USER_META_LENGTH = 1
 
       def initialize(access_token)
         self.token = Auth::AccessToken.new access_token
@@ -90,7 +92,13 @@ module RicohAPI
 
       # PUT /media/{id}/meta/user/{key}
       def add_meta(media_id, user_meta)
-        # TODO: do something
+        validate(user_meta)
+        user_meta.each do |k, v|
+          USER_META_REGEX =~ k
+          handle_response(:as_raw) do
+            token.put endpoint_for("media/#{media_id}/meta/user/#{$1}"), v, {'Content-Type': 'text/plain'}
+          end
+        end
       end
 
       # DELETE /media/{id}/meta/user, DELETE /media/{id}/meta/user/{key}
@@ -132,6 +140,15 @@ module RicohAPI
 
       def endpoint_for(path)
         File.join BASE_URL, path
+      end
+
+      def validate(param)
+        raise Error.new("Invalid parameter: #{param.inspect}: nothing to request.") unless param
+        if param.is_a? Hash
+          param.each do |k, v|
+            raise Error.new("Invalid parameter: #{k.inspect} => #{v.inspect}") unless k && (MIN_USER_META_LENGTH..MAX_USER_META_LENGTH).include?(v.length)
+          end
+        end
       end
     end
   end

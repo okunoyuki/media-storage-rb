@@ -62,6 +62,16 @@ describe RicohAPI::MStorage::Client do
     end
   end
 
+  describe '#add_meta' do
+    it 'should return nothing' do
+      request_user_meta = {"user.#{user_meta_key}" => 'value1'}
+      response = mock_request :put, "/media/#{media_id}/meta/user/#{user_meta_key}", 'add_meta.data' do
+        client.add_meta media_id, request_user_meta
+      end
+      response.should  == request_user_meta
+    end
+  end
+
   describe '#meta' do
     it 'should return all metadata of the media' do
       response = mock_request :get, "/media/#{media_id}/meta", 'meta.json' do
