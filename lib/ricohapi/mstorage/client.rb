@@ -135,8 +135,7 @@ module RicohAPI
       def validate(value)
         if value.is_a? Hash
           value.each do |k, v|
-            raise Error.new("Invalid parameter: #{k.inspect} => #{v.inspect}") unless k
-            raise Error.new("Invalid parameter: #{k.inspect} => #{v.inspect}") unless (MIN_USER_META_LENGTH..MAX_USER_META_LENGTH).include? v.length
+            raise Error.new("Invalid parameter: #{k.inspect} => #{v.inspect}") unless k && (MIN_USER_META_LENGTH..MAX_USER_META_LENGTH).include?(v.length)
           end
         end
       end
