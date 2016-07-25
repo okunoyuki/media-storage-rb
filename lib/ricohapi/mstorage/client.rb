@@ -17,23 +17,19 @@ module RicohAPI
         self.token = Auth::AccessToken.new access_token
       end
 
-      # GET /media
+      # GET /media, POST /media/search
       def list(params = {})
         params.reject! do |k, v|
           ![:after, :before, :limit, :filter].include? k.to_sym
           v.nil?
         end
         if params.include? :filter
+          request_params = { search_veresion: SEARCH_VERSION, query: params[:filter] }
+          params.delete :filter
+          request_params[:paging] = { before: params[:before], after: params[:after],
+                                      limit: params[:limit] } unless params.empty?
           handle_response do
-            token.post endpoint_for('media/search'), {
-              search_veresion: SEARCH_VERSION,
-              query: params[:filter],
-              paging: {
-                before: params[:before],
-                after: params[:after],
-                limit: params[:limit]
-              }
-            }.to_json, {'Content-Type': 'application/json'}
+            token.post endpoint_for('media/search'), request_params.to_json, {'Content-Type': 'application/json'}
           end
         else
           handle_response do
@@ -73,7 +69,7 @@ module RicohAPI
             token.get endpoint_for("media/#{media_id}/meta/user/#{$1}")
           end
         else
-          raise Error.new("invalid field_name: #{field_name.inspect}")
+          raise Error.new("Invalid field_name: #{field_name.inspect}")
         end
       end
 
@@ -114,7 +110,7 @@ module RicohAPI
             token.delete endpoint_for("media/#{media_id}/meta/user/#{$1}")
           end
         else
-          raise Error.new("invalid key: #{key.inspect}")
+          raise Error.new("Invalid key: #{key.inspect}")
         end
       end
 
