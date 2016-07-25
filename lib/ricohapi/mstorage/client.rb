@@ -21,6 +21,7 @@ module RicohAPI
       def list(params = {})
         params.reject! do |k, v|
           ![:after, :before, :limit, :filter].include? k.to_sym
+          v.nil?
         end
         if params.include? :filter
           handle_response do
