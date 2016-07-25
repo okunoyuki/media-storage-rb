@@ -122,9 +122,7 @@ module RicohAPI
       private
 
       def handle_response(as_raw = false, retrying = false)
-        if self.auth_client
-          self.token = self.auth_client.api_token_for! RicohAPI::MStorage::SCOPE
-        end
+        self.token = self.auth_client.api_token_for! RicohAPI::MStorage::SCOPE if self.auth_client
 
         response = yield
         case response.status
