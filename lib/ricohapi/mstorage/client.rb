@@ -26,8 +26,8 @@ module RicohAPI
         if params.include? :filter
           request_params = { search_veresion: SEARCH_VERSION, query: params[:filter] }
           params.delete :filter
-          request_params[:paging] = { before: params[:before], after: params[:after],
-                                      limit: params[:limit] } unless params.empty?
+          request_params[:paging] = params unless params.empty?
+
           handle_response do
             token.post endpoint_for('media/search'), request_params.to_json, {'Content-Type': 'application/json'}
           end
