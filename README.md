@@ -46,7 +46,7 @@ access_token = api_session.access_token
 ### Constructor
 
 ```ruby
-mstorage = RicohAPI::MStorage::Client.new access_token, auth_client: client
+mstorage = RicohAPI::MStorage::Client.new client
 ```
 
 or

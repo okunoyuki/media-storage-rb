@@ -13,12 +13,12 @@ module RicohAPI
       MAX_USER_META_LENGTH = 1024
       MIN_USER_META_LENGTH = 1
 
-      def initialize(access_token, params = {})
-        if params[:auth_client]
-          self.auth_client = params[:auth_client]
-          self.token = self.auth_client.api_token_for! RicohAPI::MStorage::SCOPE
+      def initialize(token)
+        if token.is_a? Auth::Client
+          self.auth_client = token
+          self.token = self.auth_client.api_token_for!
         else
-          self.token = Auth::AccessToken.new access_token
+          self.token = Auth::AccessToken.new token
         end
       end
 
@@ -122,7 +122,7 @@ module RicohAPI
       private
 
       def handle_response(as_raw = false, retrying = false)
-        self.token = self.auth_client.api_token_for! RicohAPI::MStorage::SCOPE if self.auth_client
+        self.token = self.auth_client.api_token_for! if self.auth_client
 
         response = yield
         case response.status
