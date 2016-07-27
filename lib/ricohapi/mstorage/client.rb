@@ -4,7 +4,7 @@
 module RicohAPI
   module MStorage
     class Client
-      attr_accessor :token
+      attr_accessor :token, :auth_client
 
       class Error < StandardError; end
 
@@ -13,8 +13,13 @@ module RicohAPI
       MAX_USER_META_LENGTH = 1024
       MIN_USER_META_LENGTH = 1
 
-      def initialize(access_token)
-        self.token = Auth::AccessToken.new access_token
+      def initialize(token)
+        if token.is_a? Auth::Client
+          self.auth_client = token
+          self.token = self.auth_client.api_token_for!
+        else
+          self.token = Auth::AccessToken.new token
+        end
       end
 
       # GET /media, POST /media/search
@@ -117,6 +122,8 @@ module RicohAPI
       private
 
       def handle_response(as_raw = false, retrying = false)
+        self.token = self.auth_client.api_token_for! if self.auth_client
+
         response = yield
         case response.status
         when 200...300
